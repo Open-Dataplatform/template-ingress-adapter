@@ -1,0 +1,3 @@
+{
+  "system_name": "{{cookiecutter.app_title|replace(' ', '')|lower}}"
+}
