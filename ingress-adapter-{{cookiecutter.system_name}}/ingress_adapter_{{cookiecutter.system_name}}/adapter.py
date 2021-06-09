@@ -9,9 +9,9 @@ credentials_config = configuration.get_credentials_config()
 logger = configuration.get_logger()
 
 
-class {{cookiecutter.repo_name|title}}Adapter(IngressAdapter):
+class {{cookiecutter.system_name|title}}Adapter(IngressAdapter):
     """
-    The {{cookiecutter.repo_name|title}} Adapter.
+    The {{cookiecutter.system_name|title}} Adapter.
     Implements the retrieve_data method.
     """
     def __init__(self, ingress_url: str,  # pylint: disable=too-many-arguments
@@ -24,9 +24,9 @@ class {{cookiecutter.repo_name|title}}Adapter(IngressAdapter):
 
     def retrieve_data(self) -> bytes:
         """
-        Retrieves the data from {{cookiecutter.repo_name|title}}.
+        Retrieves the data from {{cookiecutter.system_name|title}}.
         """
-        logger.debug('Running the {{cookiecutter.repo_name|title}} Ingress Adapter')
+        logger.debug('Running the {{cookiecutter.system_name|title}} Ingress Adapter')
 
         # TODO: Implement code to retrieve data and return it as a bytes string.
 
@@ -44,11 +44,11 @@ class {{cookiecutter.repo_name|title}}Adapter(IngressAdapter):
         return 'test.data'
 
 
-def ingest_{{cookiecutter.repo_name}}_data():
+def ingest_{{cookiecutter.system_name}}_data():
     """
     Setups the adapter and runs it.
     """
-    adapter = {{cookiecutter.repo_name|title}}Adapter(config['Azure Storage']['ingress_url'],
+    adapter = {{cookiecutter.system_name|title}}Adapter(config['Azure Storage']['ingress_url'],
                                                       credentials_config['Authorization']['tenant_id'],
                                                       credentials_config['Authorization']['client_id'],
                                                       credentials_config['Authorization']['client_secret'],
@@ -62,4 +62,4 @@ def ingest_{{cookiecutter.repo_name}}_data():
 
 
 if __name__ == "__main__":
-    ingest_{{cookiecutter.repo_name}}_data()
+    ingest_{{cookiecutter.system_name}}_data()
