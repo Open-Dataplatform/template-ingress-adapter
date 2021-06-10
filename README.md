@@ -39,3 +39,5 @@ cookiecutter https://github.com/Open-Dataplatform/template-ingress-adapter.git
 
 This will prompt your for a `system_name`. This name must be in lower case and should identify the 
 adapter you are building, such as jao or ikontrol.
+
+Say yes to the question "Is it okay to delete and re-download it?".
