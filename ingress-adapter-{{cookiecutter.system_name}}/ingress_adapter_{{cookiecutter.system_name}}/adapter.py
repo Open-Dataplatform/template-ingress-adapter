@@ -21,7 +21,6 @@ class {{cookiecutter.system_name|title}}Adapter(IngressAdapter):
                  dataset_guid: str):
         super().__init__(ingress_url, tenant_id, client_id, client_secret, dataset_guid)
 
-
     def retrieve_data(self) -> bytes:
         """
         Retrieves the data from {{cookiecutter.system_name|title}}.
