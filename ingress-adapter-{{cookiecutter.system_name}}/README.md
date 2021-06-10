@@ -15,7 +15,7 @@ TODO
 
 ### Usage
 ```sh
-$ python -m ingress_adapter_{{cookiecutter.system_name}}.transform [--ingresss_time %Y-%m-%dT%H']
+$ python -m ingress_adapter_{{cookiecutter.system_name}}.adapter
 ```
 
 
