@@ -30,7 +30,8 @@ this is not the case.
 
 ### Usage
 
-You can create a new ingress adapter repository (locally )using the following command: 
+You can create a new ingress adapter repository (locally) using the following command (you need to 
+be in the directory where you want to place the repository): 
 
 ```sh
 cookiecutter https://github.com/Open-Dataplatform/template-ingress-adapter.git
