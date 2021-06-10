@@ -19,7 +19,7 @@ contain all the basic project structure including tox, configuration files, read
 You need to install cookiecutter. It is best if you install it as part of your local Python libraries and 
 not inside a venv.
 
-You can install cookiecutter usinge the following command:
+You can install cookiecutter using the following command:
 
 ```
 pip install cookiecutter
