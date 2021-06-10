@@ -55,10 +55,11 @@ def ingest_{{cookiecutter.system_name}}_data():
                                                       config['Datasets']['source']
                                                       )
 
-    # TODO:
-    adapter.upload_json_data(self, schema_validate: bool)
-
-    adapter.upload_json_data(False)
+    # TODO: use either:
+    # TODO: adapter.upload_json_data(self, schema_validate: bool)
+    # TODO: or
+    # TODO: adapter.upload_data()
+    # TODO: depending on your type of data.
 
 
 if __name__ == "__main__":
