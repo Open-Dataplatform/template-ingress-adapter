@@ -24,7 +24,7 @@ $ python -m ingress_adapter_{{cookiecutter.system_name}}.adapter
 The application needs a configuration file `conf.ini` (see `conf.example.ini`) and a credentials file `credentials.ini`
 (see `credentials.example.ini`). The configuration file must 
 be placed in the root of the project or in the locations `/etc/osiris/conf.ini` or 
-`/etc/transform-ingress2event-time-conf.ini`. 
+`/etc/transform-{{cookiecutter.system_name|replace("_","-")}}-conf.ini`. 
 
 ```
 [Logging]
