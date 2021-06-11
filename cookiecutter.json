@@ -1,3 +1,6 @@
 {
-  "system_name": ""
+  "name": "",
+  "repo_name": "{{cookiecutter.name|replace(' ', '-')|replace('_', '-')}}",
+  "module_name": "{{cookiecutter.name|replace(' ', '_')|replace('-', '_')}}",
+  "class_name": "{{cookiecutter.name|replace(' ', '')|replace('_', '')|replace('-', '')|title}}"
 }

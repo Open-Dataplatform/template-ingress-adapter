@@ -9,7 +9,7 @@ credentials_config = configuration.get_credentials_config()
 logger = configuration.get_logger()
 
 
-class {{cookiecutter.system_name|title}}Adapter(IngressAdapter):
+class {{cookiecutter.class_name}}Adapter(IngressAdapter):
     """
     The {{cookiecutter.system_name|title}} Adapter.
     Implements the retrieve_data method.
@@ -43,11 +43,11 @@ class {{cookiecutter.system_name|title}}Adapter(IngressAdapter):
         return 'test.data'
 
 
-def ingest_{{cookiecutter.system_name}}_data():
+def ingest_{{cookiecutter.module_name}}_data():
     """
     Setups the adapter and runs it.
     """
-    adapter = {{cookiecutter.system_name|title}}Adapter(config['Azure Storage']['ingress_url'],
+    adapter = {{cookiecutter.class_name}}Adapter(config['Azure Storage']['ingress_url'],
                                                       credentials_config['Authorization']['tenant_id'],
                                                       credentials_config['Authorization']['client_id'],
                                                       credentials_config['Authorization']['client_secret'],
@@ -62,4 +62,4 @@ def ingest_{{cookiecutter.system_name}}_data():
 
 
 if __name__ == "__main__":
-    ingest_{{cookiecutter.system_name}}_data()
+    ingest_{{cookiecutter.module_name}}_data()
