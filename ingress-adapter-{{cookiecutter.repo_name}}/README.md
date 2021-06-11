@@ -15,7 +15,7 @@ TODO
 
 ### Usage
 ```sh
-$ python -m ingress_adapter_{{cookiecutter.system_name}}.adapter
+$ python -m ingress_adapter_{{cookiecutter.module_name}}.adapter
 ```
 
 
