@@ -11,7 +11,7 @@ logger = configuration.get_logger()
 
 class {{cookiecutter.class_name}}Adapter(IngressAdapter):
     """
-    The {{cookiecutter.system_name|title}} Adapter.
+    The {{cookiecutter.name|title}} Adapter.
     Implements the retrieve_data method.
     """
     def __init__(self, ingress_url: str,  # pylint: disable=too-many-arguments
@@ -23,9 +23,9 @@ class {{cookiecutter.class_name}}Adapter(IngressAdapter):
 
     def retrieve_data(self) -> bytes:
         """
-        Retrieves the data from {{cookiecutter.system_name|title}}.
+        Retrieves the data from {{cookiecutter.name|title}}.
         """
-        logger.debug('Running the {{cookiecutter.system_name|title}} Ingress Adapter')
+        logger.debug('Running the {{cookiecutter.name|title}} Ingress Adapter')
 
         # TODO: Implement code to retrieve data and return it as a bytes string.
 
