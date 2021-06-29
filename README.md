@@ -40,5 +40,5 @@ cookiecutter https://github.com/Open-Dataplatform/template-ingress-adapter.git
 Say yes to the question "Is it okay to delete and re-download it?".
 
 You will be prompted for a `name`. This name must be in lower case and should identify the 
-transform you are building, such as jao or ikontrol. Answer the rest by pressing enter unless you want to
+adapter you are building, such as jao or ikontrol. Answer the rest by pressing enter unless you want to
 change the default values.
