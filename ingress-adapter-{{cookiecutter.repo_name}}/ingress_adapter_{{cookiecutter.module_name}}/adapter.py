@@ -1,4 +1,9 @@
-from osiris.apis.ingress import Ingress
+"""
+{{cookiecutter.name|title}} Adapter for Ingress
+"""
+
+from typing import Optional
+
 from osiris.core.configuration import ConfigurationWithCredentials
 from osiris.adapters.ingress_adapter import IngressAdapter
 
@@ -21,7 +26,7 @@ class {{cookiecutter.class_name}}Adapter(IngressAdapter):
                  dataset_guid: str):
         super().__init__(ingress_url, tenant_id, client_id, client_secret, dataset_guid)
 
-    def retrieve_data(self) -> bytes:
+    def retrieve_data(self) -> Optional[bytes]:
         """
         Retrieves the data from {{cookiecutter.name|title}}.
         """
@@ -51,11 +56,10 @@ def ingest_{{cookiecutter.module_name}}_data():
                                                       credentials_config['Authorization']['tenant_id'],
                                                       credentials_config['Authorization']['client_id'],
                                                       credentials_config['Authorization']['client_secret'],
-                                                      config['Datasets']['source']
-                                                      )
+                                                      config['Datasets']['source'])
 
     # TODO: use either:
-    # TODO: adapter.upload_json_data(self, schema_validate: bool)
+    # TODO: adapter.upload_json_data(schema_validate: bool)
     # TODO: or
     # TODO: adapter.upload_data()
     # TODO: depending on your type of data.
