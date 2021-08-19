@@ -5,6 +5,7 @@
 from typing import Optional
 
 from osiris.core.configuration import ConfigurationWithCredentials
+from osiris.core.azure_client_authorization import ClientAuthorization
 from osiris.adapters.ingress_adapter import IngressAdapter
 
 
@@ -24,7 +25,8 @@ class {{cookiecutter.class_name}}Adapter(IngressAdapter):
                  client_id: str,
                  client_secret: str,
                  dataset_guid: str):
-        super().__init__(ingress_url, tenant_id, client_id, client_secret, dataset_guid)
+        client_auth = ClientAuthorization(tenant_id, client_id, client_secret)
+        super().__init__(client_auth=client_auth, ingress_url=ingress_url, dataset_guid=dataset_guid)
 
     def retrieve_data(self) -> Optional[bytes]:
         """
