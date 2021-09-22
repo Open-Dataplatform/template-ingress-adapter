@@ -1,13 +1,7 @@
 # template-ingress-adapter <!-- omit in toc -->
 - [Introduction](#introduction)
 - [Installation](#installation)
-  - [Logging](#logging)
-- [Development](#development)
-  - [Running locally](#running-locally)
-  - [tox](#tox)
-  - [Commands](#commands)
-    - [Linting](#linting)
-    - [Tests](#tests)
+  - [Logging](#usage)
   
 ## Introduction
 
