@@ -1,4 +1,4 @@
-# ingress-adapter-{{cookiecutter.repo_name}} <!-- omit in toc -->
+# ingress-{{cookiecutter.repo_name}} <!-- omit in toc -->
 - [Introduction](#introduction)
 - [Configuration](#configuration)
   - [Logging](#logging)
@@ -15,7 +15,7 @@ TODO
 
 ### Usage
 ```sh
-$ python -m ingress_adapter_{{cookiecutter.module_name}}.adapter
+$ python -m ingress_{{cookiecutter.module_name}}.adapter
 ```
 
 
