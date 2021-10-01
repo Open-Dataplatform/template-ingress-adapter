@@ -4,16 +4,15 @@
 from datetime import datetime
 from io import BytesIO
 from typing import Optional, Dict, Tuple
+import logging
+import logging.config
+from configparser import ConfigParser
 
 from osiris.apis.ingress import Ingress
-from osiris.core.configuration import ConfigurationWithCredentials
 from osiris.core.azure_client_authorization import ClientAuthorization
 
 
-configuration = ConfigurationWithCredentials(__file__)
-config = configuration.get_config()
-credentials_config = configuration.get_credentials_config()
-logger = configuration.get_logger()
+logger = logging.getLogger(__file__)
 
 
 def retrieve_data(state: Dict) -> Tuple[Optional[bytes], Dict]:
@@ -43,6 +42,13 @@ def main():
     """
     Setups the ingress-api, retrieves state, uploads data to ingress-api, saves state after successful upload.
     """
+    config = ConfigParser()
+    config.read(['conf.ini', '/etc/osiris/conf.ini'])
+    credentials_config = ConfigParser()
+    credentials_config.read(['credentials.ini', '/vault/secrets/credentials.ini'])
+
+    logging.config.fileConfig(fname=config['Logging']['configuration_file'],  # type: ignore
+                              disable_existing_loggers=False)
 
     # Setup authorization
     client_auth = ClientAuthorization(tenant_id=credentials_config['Authorization']['tenant_id'],
