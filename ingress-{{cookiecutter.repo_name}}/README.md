@@ -1,3 +1,10 @@
+[![Pylint](https://github.com/Open-Dataplatform/ingress-{{cookiecutter.repo_name}}/actions/workflows/pylint.yml/badge.svg)](https://github.com/Open-Dataplatform/ingress-{{cookiecutter.repo_name}}/actions/workflows/pylint.yml)
+[![Bandit](https://github.com/Open-Dataplatform/ingress-{{cookiecutter.repo_name}}/actions/workflows/bandit.yml/badge.svg)](https://github.com/Open-Dataplatform/ingress-{{cookiecutter.repo_name}}/actions/workflows/bandit.yml)
+[![Flake8](https://github.com/Open-Dataplatform/ingress-{{cookiecutter.repo_name}}/actions/workflows/flake8.yml/badge.svg)](https://github.com/Open-Dataplatform/ingress-{{cookiecutter.repo_name}}/actions/workflows/flake8.yml)
+[![Mypy](https://github.com/Open-Dataplatform/ingress-{{cookiecutter.repo_name}}/actions/workflows/mypy.yml/badge.svg)](https://github.com/Open-Dataplatform/ingress-{{cookiecutter.repo_name}}/actions/workflows/mypy.yml)
+[![Pytest](https://github.com/Open-Dataplatform/ingress-{{cookiecutter.repo_name}}/actions/workflows/pytest.yml/badge.svg)](https://github.com/Open-Dataplatform/ingress-{{cookiecutter.repo_name}}/actions/workflows/pytest.yml)
+
+
 # ingress-{{cookiecutter.repo_name}} <!-- omit in toc -->
 - [Introduction](#introduction)
 - [Configuration](#configuration)
