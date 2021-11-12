@@ -15,7 +15,6 @@ from osiris.core.azure_client_authorization import ClientAuthorization
 
 logger = logging.getLogger(__file__)
 
-
 def retrieve_data(state: Dict) -> Tuple[Optional[bytes], Dict]:
     """
     Retrieves the data from {{cookiecutter.name|title}}.
@@ -38,6 +37,36 @@ def retrieve_data(state: Dict) -> Tuple[Optional[bytes], Dict]:
     # return ingest_data, state
     return b'', state
 
+def retrieve_files(state: Dict) -> Tuple[Optional[Dict], Dict]:
+    """
+    Retrieves the data from {{cookiecutter.name|title}}.
+    """
+    logger.info('Running the {{cookiecutter.name|title}} Ingress Adapter')
+
+    # Given the state from last run, retrieve next batch of data and update state
+    # - Notice, state will first be saved after successful upload
+
+    # TODO: Implement code to retrieve the files
+
+    # TODO: Return files and state
+    #       - If no new data in batch, return {} and state (return {}, state)
+
+    # Example of how to return data
+    # - if data is collected and prepared in a DataFrame: ingest_data_df
+    # - then get the binary data: ingest_data_df.to_json(orient='records', date_format='iso').encode('UTF-8')
+    # Example:
+    # ingest_data = ingest_data_df.to_json(orient='records', date_format='iso').encode('UTF-8')
+    # ingest_files = {"ingest_file_name":ingest_data}
+    # return ingest_files, state
+    return {}, state
+
+def ingress_files(ingress_api, files_to_ingest):
+    for file_name, data_to_ingest in files_to_ingest.items():
+        file = BytesIO(data_to_ingest)
+        file.name = file_name
+        # This call we raise Exception unless 201 is returned
+        ingress_api.upload_file(file=file)
+        logger.info(f'Data successfully uploaded: {file_name}')
 
 def __init_argparse() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description='Ingress Adapter for {{cookiecutter.name|title}}')
@@ -109,9 +138,12 @@ def main():
     # - This case is not used often - no sample code below
     # Option 3: Upload non-json formatted data to event time
     # - This case is not used often - no sample code below
-    # Option 4: Upload non-json formatted data to ingress time
-    # - This case is not used often - no sample code below - example is ikontrol-adapter
-
+    # Option 4: Upload non-json formatted files to ingress time
+    # - Use this option when:
+    #   - You wanna keep the raw files
+    #   - One run can generate multiple files
+    #   - A transformation is needed
+    
     # TODO: Only keep the code from [START] to [END] of one of the options of the code below
 
     # [START] Option 1
@@ -144,7 +176,13 @@ def main():
     ingress_api.upload_json_file(file=file,
                                  schema_validate=schema_validate)
     # [END] Option 2
-
+    
+    
+    # [START] Option 4
+    
+    
+    # [END] Option 4
+    
     # Save the state
     ingress_api.save_state(state)
     logger.info('Data successfully uploaded: {{cookiecutter.name|title}} Ingress Adapter')
