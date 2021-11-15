@@ -43,7 +43,7 @@ def retrieve_files(state: Dict) -> Tuple[Optional[Dict], Dict]:
     """
     logger.info('Running the {{cookiecutter.name|title}} Ingress Adapter')
 
-    # Given the state from last run, retrieve next batch of data and update state
+    # Given the state from last run, retrieve next batch of files and update state
     # - Notice, state will first be saved after successful upload
 
     # TODO: Implement code to retrieve the files
@@ -51,9 +51,6 @@ def retrieve_files(state: Dict) -> Tuple[Optional[Dict], Dict]:
     # TODO: Return files and state
     #       - If no new data in batch, return {} and state (return {}, state)
 
-    # Example of how to return data
-    # - if data is collected and prepared in a DataFrame: ingest_data_df
-    # - then get the binary data: ingest_data_df.to_json(orient='records', date_format='iso').encode('UTF-8')
     # Example:
     # ingest_data = ingest_data_df.to_json(orient='records', date_format='iso').encode('UTF-8')
     # ingest_files = {"ingest_file_name":ingest_data}
@@ -116,15 +113,6 @@ def main():
     # Get the state from last run.
     # - The state is kept in the ingress-guid as state.json, if it does not exist, an empty dict is returned
     state = ingress_api.retrieve_state()
-
-    # Get the next data to upload
-    data_to_ingest, state = retrieve_data(state)
-
-    # If no new data, return
-    if data_to_ingest is None:
-        logger.info('No new data to upload: {{cookiecutter.name|title}} Ingress Adapter')
-        return
-
     # There are 4 options to upload data, where the first 2 options cover most cases
     # Option 1: Upload to event time
     # - Use this option when
@@ -147,39 +135,49 @@ def main():
     # TODO: Only keep the code from [START] to [END] of one of the options of the code below
 
     # [START] Option 1
-    file = BytesIO(data_to_ingest)
-    file.name = 'data.json'
-    # TODO: set event time (it should depend on the batch of data)
-    # The time resolution is set by event_time, hence if the format follows
-    # - If event_time = '' then data is stored in root folder
-    # - If event_time = '2021' then data is stored on yearly basis
-    # - If event_time = '2021-01' then data is stored on monthly basis
-    # ...
-    # - If event_time = '2021-01-01T01:01' then data is stored on minutely basis
-    event_time = '2021-01-01T01:01'
-    # Set if schema validation is needed
-    schema_validate = False
+    # Get the next data to upload
+    data_to_ingest, state = retrieve_data(state)
+    
+    if data_to_ingest:
+        file = BytesIO(data_to_ingest)
+        file.name = 'data.json'
+        # TODO: set event time (it should depend on the batch of data)
+        # The time resolution is set by event_time, hence if the format follows
+        # - If event_time = '' then data is stored in root folder
+        # - If event_time = '2021' then data is stored on yearly basis
+        # - If event_time = '2021-01' then data is stored on monthly basis
+        # ...
+        # - If event_time = '2021-01-01T01:01' then data is stored on minutely basis
+        event_time = '2021-01-01T01:01'
+        # Set if schema validation is needed
+        schema_validate = False
 
-    # This call we raise Exception unless 201 is returned
-    ingress_api.upload_json_file_event_time(file=file,
-                                            event_time=event_time,
-                                            schema_validate=schema_validate)
+        # This call we raise Exception unless 201 is returned
+        ingress_api.upload_json_file_event_time(file=file,
+                                                event_time=event_time,
+                                                schema_validate=schema_validate)
     # [END] Option 1
 
     # [START] Option 2
-    file = BytesIO(data_to_ingest)
-    file.name = datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S.%fZ.json')
-    # Set if schema validation is needed
-    schema_validate = False
-
-    # This call we raise Exception unless 201 is returned
-    ingress_api.upload_json_file(file=file,
-                                 schema_validate=schema_validate)
+    # Get the next data to upload
+    data_to_ingest, state = retrieve_data(state)
+    
+    if data_to_ingest:
+        file = BytesIO(data_to_ingest)
+        file.name = datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S.%fZ.json')
+        # Set if schema validation is needed
+        schema_validate = False
+    
+        # This call we raise Exception unless 201 is returned
+        ingress_api.upload_json_file(file=file,
+                                     schema_validate=schema_validate)
     # [END] Option 2
     
     
     # [START] Option 4
     
+    files_to_ingest, state = retrieve_files(state)
+    ingress_files(ingress_api, files_to_ingest)
     
     # [END] Option 4
     
