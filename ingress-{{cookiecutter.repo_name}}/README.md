@@ -43,7 +43,16 @@ filesystem_name = <container_name>
 
 [Datasets]
 source = <source_guid>
+max_interval_to_retrieve = <iso_time_duration>
 ```
+
+The format of `max_interval_to_retrieve` follows the
+[ISO standard for time durations](https://en.wikipedia.org/wiki/ISO_8601#Durations), but months and years are not
+supported. Examples are
+- One hour: `PT1H`
+- One day: `P1DT`
+- One week: `P7DT`
+- One month: `P30DT`
 
 The credentials file must be placed in the root of the project or in the
 location `/vault/secrets/credentials.ini`
