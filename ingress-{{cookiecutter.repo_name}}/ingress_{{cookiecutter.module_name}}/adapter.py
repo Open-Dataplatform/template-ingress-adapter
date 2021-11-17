@@ -93,7 +93,7 @@ def retrieve_data(start_time: datetime, end_time: datetime) -> Tuple([List(Dict(
     """
 
     # TODO: Extract data and convert it to Pandas Dataframe. Example:
-    dataframe = pd.DataFrame({})
+    dataframe = pd.read_csv('https://data.dk/csv_data', parse_dates=['timestamp'])
 
     # TODO: Extract actual data end time. Example:
     data_end_time = dataframe.timestamp.max() + timedelta(hours=1)
