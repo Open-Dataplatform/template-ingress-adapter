@@ -23,7 +23,7 @@ def main():
     """
     Reads configurations, sets up ingress-api, retrieves data and saves it to Ingress. If a time interval is given as
     an input argument, data is retrieved for this inteval. If not, it is based on the state file, which will also be
-    updated after a successful run.
+    updated after each upload.
     """
 
     arg_parser = __init_argparse()
@@ -34,20 +34,13 @@ def main():
     credentials_config = ConfigParser()
     credentials_config.read(args.credentials)
 
-    logging.config.fileConfig(fname=config['Logging']['configuration_file'],  # type: ignore
-                              disable_existing_loggers=False)
+    logging.config.fileConfig(fname=config['Logging']['configuration_file'], disable_existing_loggers=False)
     update_azure_logging(config)
 
-    client_auth = ClientAuthorization(tenant_id=credentials_config['Authorization']['tenant_id'],
-                                      client_id=credentials_config['Authorization']['client_id'],
-                                      client_secret=credentials_config['Authorization']['client_secret'])
-
-    ingress_api = Ingress(client_auth=client_auth,
-                          ingress_url=config['Azure Storage']['ingress_url'],
-                          dataset_guid=config['Datasets']['source'])
-
+    ingress_api = initialize_ingress_api(config, credentials_config)
     max_interval_to_retrieve = pd.Timedelta(config.max_interval_to_retrieve)
 
+    # Get from and to dates
     run_adapter_based_on_state_file = args.from_date is not None
     if run_adapter_based_on_state_file:
         from_date, to_date = extract_time_interval_from_state_file(state)
@@ -160,6 +153,20 @@ def __init_argparse() -> argparse.ArgumentParser:
                         help=f'setting the end time for the adapter. If not given, it defaults to today.')
 
     return parser
+
+
+def initialize_ingress_api(config, credentials_config):
+    """Returns Ingress API instance."""
+    client_auth = ClientAuthorization(tenant_id=credentials_config['Authorization']['tenant_id'],
+                                      client_id=credentials_config['Authorization']['client_id'],
+                                      client_secret=credentials_config['Authorization']['client_secret'])
+
+    ingress_api = Ingress(client_auth=client_auth,
+                          ingress_url=config['Azure Storage']['ingress_url'],
+                          dataset_guid=config['Datasets']['source'])
+
+    return ingress_api
+
 
 def update_azure_logging(config):
     """Disable azure INFO logging from Azure"""
