@@ -26,11 +26,11 @@ To run the adapter based on the state file, use:
 $ python -m ingress_{{cookiecutter.module_name}}.adapter
 ```
 
-To run the atapter in a specific time interval, use:
+To run the adapter in a specific time interval, use:
 ```sh
-$ python -m ingress_{{cookiecutter.module_name}}.adapter --start_time 2021-01-01 --end_time 2021-01-20T12
+$ python -m ingress_{{cookiecutter.module_name}}.adapter --from_date 2021-01-01 --to_date 2021-01-20T12
 ```
-If `end_time` is not specified, it is set to utcnow. The timestamps are parsed by the Osiris parse_date_str.
+If `to_date` is not specified, it is set to utcnow. The timestamps are parsed by the Osiris parse_date_str().
 
 ## Configuration
 
