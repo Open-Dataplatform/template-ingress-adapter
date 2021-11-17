@@ -47,43 +47,29 @@ def main():
                           dataset_guid=config['Datasets']['source'])
 
     max_interval_to_retrieve = pd.Timedelta(config.max_interval_to_retrieve)
+
     run_adapter_based_on_state_file = args.from_date is not None
     if run_adapter_based_on_state_file:
         from_date, to_date = extract_time_interval_from_state_file(state)
-        next_from_date = retrieve_and_upload_data(from_date, to_date)
-
-        state['next_from_date'] = datetime.strftime(next_from_date, DATE_FORMAT)
-        state['last_successful_run'] = datetime.strftime(datetime.utcnow(), DATE_FORMAT)
-        ingress_api.save_state(state)
     else:
-        from_date, to_date = args.from_date, args.to_date
-        retrieve_and_upload_data(from_date, to_date)
+        from_date, to_date = args.from_date, args.retrieve_to_date
 
-
-def retrieve_and_upload_data(from_date, to_date, max_interval_to_retrieve: timedelta):
-    """
-    Retrieves and uploads data to Ingress. If the input time interval is longer than max_interval_to_retrieve,
-    it splits the interval and makes multiple retrievals and uploads.
-    """
-
-    if to_date - from_date <= max_interval_to_retrieve:
-        retrieved_data, next_from_date = retrieve_data(from_date, to_date)
-        upload_data_to_ingress(ingress_api, retrieved_data)
-    else:
-        retrieve_from_date = from_date
+    # The following loop is used to split the time interval if it is longer than max_interval_to_retrieve. If it is
+    # longer, multiple retrievals and uploads are made.
+    retrieve_from_date = from_date
+    while retrieve_from_date < to_date:
         retrieve_to_date = min(to_date, retrieve_from_date + max_interval_to_retrieve)
 
-        while retrieve_from_date < to_date:
-            retrieved_data, retrieve_from_date = retrieve_data(retrieve_from_date, retrieve_to_date)
-            upload_data_to_ingress(ingress_api, retrieved_data)
+        # Retrieve and upload data
+        retrieved_data, retrieve_from_date = retrieve_data(retrieve_from_date, retrieve_to_date)
+        upload_data_to_ingress(ingress_api, retrieved_data)
 
-            retrieve_to_date = min(to_date, retrieve_from_date + max_interval_to_retrieve)
-
-            # TODO_TEMPLATE: Make sure that the loop breaks and logs error if the request is the same again and again.
-
-        next_from_date = retrieve_from_date
-
-    return next_from_date
+        # TODO_TEMPLATE: Make sure that the loop breaks and logs error if the request is the same again and again.
+        # Update state file
+        if run_adapter_based_on_state_file:
+            state['next_from_date'] = datetime.strftime(next_from_date, DATE_FORMAT)
+            state['last_successful_run'] = datetime.strftime(datetime.utcnow(), DATE_FORMAT)
+            ingress_api.save_state(state)
 
 
 def retrieve_data(from_date: datetime, to_date: datetime) -> Tuple([List(Dict(str))]):
