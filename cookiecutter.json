@@ -2,5 +2,9 @@
   "name": "",
   "repo_name": "{{cookiecutter.name|replace(' ', '-')|replace('_', '-')}}",
   "module_name": "{{cookiecutter.name|replace(' ', '_')|replace('-', '_')}}",
-  "class_name": "{{cookiecutter.name|replace(' ', '')|replace('_', '')|replace('-', '')|title}}"
+  "environment": ["test", "prod"],
+  "dataset_guid": "",
+  "service_principle_tenant_id": "",
+  "service_principle_client_id": "",
+  "service_principle_client_secret": ""
 }
