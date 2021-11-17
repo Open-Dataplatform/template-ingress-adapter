@@ -79,11 +79,14 @@ def retrieve_data(from_date: datetime, to_date: datetime) -> Tuple([List(Dict(st
     """
 
     # TODO: Extract data and convert it to Pandas Dataframe. Example:
-    dataframe = pd.read_csv('https://data.dk/csv_data', parse_dates=['timestamp'])
+    dataframe = pd.read_csv('https://raw.githubusercontent.com/selva86/datasets/master/a10.csv', parse_dates=['date'])
+    dataframe = dataframe[(from_date <= dataframe.date) & (dataframe.date <= to_date)]  # Dumb example to emulate data retrieval
 
-    # TODO: Extract actual data end time. Example:
-    data_end_date = dataframe.timestamp.max() + timedelta(hours=1)
-    filename = _get_filename(from_date, data_end_date, time_format='%Y%m%dT%H')
+    # TODO: Extract actual data end time and generate filename. Example:
+    data_end_date = dataframe.date.max() + timedelta(days=1)
+    filename = _get_filename(from_date, data_end_date, time_format='%Y%m%d')
+
+    # TODO_TEMPLATE: How to take care of empty dataframes or errors?
 
     # If you need to retrieve data from e.g. multiple endpoints, you can do something like:
     # data = []
