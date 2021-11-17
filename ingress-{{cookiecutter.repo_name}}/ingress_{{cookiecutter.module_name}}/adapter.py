@@ -121,13 +121,14 @@ def upload_data_to_ingress(ingress_api, retrieved_data):
     """
     Uploads data to Ingress.
     """
-    for file_name, dataframe_to_ingest in retrieved_data.items():
-        data_to_ingest = dataframe_to_ingest.to_json(orient='records', date_format='iso').encode('UTF-8')
-        file = BytesIO(data_to_ingest)
-        file.name = f'{file_name}.json'
+    for filename, dataframe_to_ingest in retrieved_data.items():
+        file = BytesIO()
+        file.name = f'{filename}.parquet'
+        dataframe_to_ingest.to_parquet(file, engine='pyarrow', compression='snappy')
+        file.seek(0)
 
         ingress_api.upload_file(file=file)
-        logger.info(f'Data successfully uploaded: {file_name}')
+        logger.info(f'Data successfully uploaded: {filename}')
 
 
 def _get_filename(from_date, to_date, time_format='%Y%m%dT%H%M%SZ'):
