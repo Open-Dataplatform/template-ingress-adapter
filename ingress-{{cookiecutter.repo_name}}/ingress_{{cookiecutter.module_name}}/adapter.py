@@ -2,12 +2,14 @@
 {{cookiecutter.name|title}} Adapter for Ingress
 """
 import argparse
-from datetime import datetime
+from datetime import datetime, timedelta
 from io import BytesIO
-from typing import Optional, Dict, Tuple
+from typing import Dict, Tuple, List
 import logging
 import logging.config
 from configparser import ConfigParser
+
+import pandas as pd
 
 from osiris.apis.ingress import Ingress
 from osiris.core.azure_client_authorization import ClientAuthorization
@@ -38,11 +40,12 @@ def main():
     update_azure_logging(config)
 
     ingress_api = initialize_ingress_api(config, credentials_config)
-    max_interval_to_retrieve = pd.Timedelta(config.max_interval_to_retrieve)
+    max_interval_to_retrieve = pd.Timedelta(config['Datasets']['max_interval_to_retrieve'])
 
     # Get from and to dates
     run_adapter_based_on_state_file = args.from_date is not None
     if run_adapter_based_on_state_file:
+        state = ingress_api.retrieve_state()
         from_date, to_date = extract_time_interval_from_state_file(state)
     else:
         from_date, to_date = args.from_date, args.retrieve_to_date
@@ -60,20 +63,21 @@ def main():
         # TODO_TEMPLATE: Make sure that the loop breaks and logs error if the request is the same again and again.
         # Update state file
         if run_adapter_based_on_state_file:
-            state['next_from_date'] = datetime.strftime(next_from_date, DATE_FORMAT)
+            state['next_from_date'] = datetime.strftime(retrieve_from_date, DATE_FORMAT)
             state['last_successful_run'] = datetime.strftime(datetime.utcnow(), DATE_FORMAT)
             ingress_api.save_state(state)
 
 
-def retrieve_data(from_date: datetime, to_date: datetime) -> Tuple([List(Dict(str))]):
+def retrieve_data(from_date: datetime, to_date: datetime) -> Tuple[List[Dict[str, pd.DataFrame]], datetime]:
     """
     Retrieves data from the source and stores it in a dataframe. The actual end time of the data is extracted and
     returned together with Ingress filename(s) and dataframe(s).
     """
 
-    # TODO: Extract data and convert it to Pandas Dataframe. Example:
-    dataframe = pd.read_csv('https://raw.githubusercontent.com/selva86/datasets/master/a10.csv', parse_dates=['date'])
-    dataframe = dataframe[(from_date <= dataframe.date) & (dataframe.date <= to_date)]  # Dumb example to emulate data retrieval
+    # TODO: Extract data and convert it to Pandas Dataframe. Example to emulate data retrieval:
+    url = 'https://github.com/jiwidi/time-series-forecasting-with-python/blob/master/datasets/air_pollution.csv?raw=true'
+    dataframe = pd.read_csv(url, parse_dates=['date'])
+    dataframe = dataframe[(from_date <= dataframe['date']) & (dataframe['date'] <= to_date)]
 
     # TODO: Extract actual data end time and generate filename. Example:
     data_end_date = dataframe.date.max() + timedelta(days=1)
@@ -110,7 +114,7 @@ def upload_data_to_ingress(ingress_api, retrieved_data):
         file.seek(0)
 
         ingress_api.upload_file(file=file)
-        logger.info(f'Data successfully uploaded: {filename}')
+        logger.info("Data successfully uploaded: %s", filename)
 
 
 def _get_filename(from_date, to_date, time_format='%Y%m%dT%H%M%SZ'):
@@ -143,14 +147,12 @@ def __init_argparse() -> argparse.ArgumentParser:
                         default=['credentials.ini', '/vault/secrets/credentials.ini'],
                         help='setting the credential file')
     parser.add_argument('--from_date',
-                        nargs=1,
-                        type=lambda s: parse_date_str(s),
-                        help=f'setting the start time for the adapter.')
+                        type=lambda s: parse_date_str(s)[0],
+                        help='setting the start time for the adapter.')
     parser.add_argument('--to_date',
-                        nargs=1,
-                        type=lambda s: parse_date_str(s),
+                        type=lambda s: parse_date_str(s)[0],
                         default=datetime.utcnow(),
-                        help=f'setting the end time for the adapter. If not given, it defaults to today.')
+                        help='setting the end time for the adapter. If not given, it defaults to today.')
 
     return parser
 
