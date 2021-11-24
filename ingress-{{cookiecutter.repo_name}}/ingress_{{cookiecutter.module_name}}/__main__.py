@@ -14,6 +14,8 @@ from osiris.core.io import parse_date_str
 
 from . import adapter
 
+DATE_FORMAT_ISO = '%Y%m%dT%H%M%SZ'
+
 
 def __init_argparse() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description='Ingress Adapter for {{cookiecutter.name|title}}')
@@ -78,12 +80,13 @@ def main():
 
     ingress_api = initialize_ingress_api(config, credentials_config)
     max_interval_to_retrieve = pd.Timedelta(config['Datasets']['max_interval_to_retrieve'])
+    date_format_in_state_file = config['Datasets']['date_format_in_state_file']
 
     # Get from and to dates
     run_adapter_based_on_state_file = args.from_date is not None
     if run_adapter_based_on_state_file:
         state = ingress_api.retrieve_state()
-        from_date, to_date = adapter.extract_time_interval_from_state_file(state)
+        from_date, to_date = adapter.extract_time_interval_from_state_file(state, date_format_in_state_file)
     else:
         from_date, to_date = args.from_date, args.retrieve_to_date
 
@@ -100,8 +103,8 @@ def main():
         # TODO_TEMPLATE: Make sure that the loop breaks and logs error if the request is the same again and again.
         # Update state file
         if run_adapter_based_on_state_file:
-            state['next_from_date'] = datetime.strftime(retrieve_from_date, DATE_FORMAT)
-            state['last_successful_run'] = datetime.strftime(datetime.utcnow(), DATE_FORMAT)
+            state['next_from_date'] = datetime.strftime(retrieve_from_date, date_format_in_state_file)
+            state['last_successful_run'] = datetime.strftime(datetime.utcnow(), DATE_FORMAT_ISO)
             ingress_api.save_state(state)
 
 

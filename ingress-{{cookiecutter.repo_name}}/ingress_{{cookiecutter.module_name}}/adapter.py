@@ -10,8 +10,6 @@ import pandas as pd
 
 logger = logging.getLogger(__file__)
 
-DATE_FORMAT = '%Y%m%dT%H%M%SZ'
-
 
 def retrieve_data(from_date: datetime, to_date: datetime) -> Tuple[List[Dict[str, pd.DataFrame]], datetime]:
     """
@@ -69,12 +67,12 @@ def _get_filename(from_date, to_date, time_format='%Y%m%dT%H%M%SZ'):
     return f'{from_date_str}--{to_date_str}'
 
 
-def extract_time_interval_from_state_file(state):
+def extract_time_interval_from_state_file(state, date_format):
     """
     Generates from_date and to_date based on state file.
     """
     # TODO: Rewrite this so that it fits to your project
-    from_date = datetime.strptime(state['next_from_date'], DATE_FORMAT)
+    from_date = datetime.strptime(state['next_from_date'], date_format)
     to_date = datetime.utcnow()
 
     return from_date, to_date
