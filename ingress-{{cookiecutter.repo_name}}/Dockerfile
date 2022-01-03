@@ -1,4 +1,4 @@
-FROM python:3.8
+FROM python:3.8-slim-bullseye
 
 COPY ./ingress_{{cookiecutter.module_name}} ./ingress_{{cookiecutter.module_name}}
 COPY requirements.txt ./

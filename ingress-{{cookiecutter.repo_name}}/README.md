@@ -21,10 +21,16 @@
 TODO
 
 ### Usage
+To run the adapter based on the state file, use:
 ```sh
 $ python -m ingress_{{cookiecutter.module_name}}.adapter
 ```
 
+To run the adapter in a specific time interval, use:
+```sh
+$ python -m ingress_{{cookiecutter.module_name}}.adapter --from_date 2021-01-01 --to_date 2021-01-20T12
+```
+If `to_date` is not specified, it is set to utcnow. The timestamps are parsed by the Osiris parse_date_str().
 
 ## Configuration
 
@@ -43,7 +49,16 @@ filesystem_name = <container_name>
 
 [Datasets]
 source = <source_guid>
+max_interval_to_retrieve = <iso_time_duration>
 ```
+
+The format of `max_interval_to_retrieve` follows the
+[ISO standard for time durations](https://en.wikipedia.org/wiki/ISO_8601#Durations), but months and years are not
+supported. Examples are
+- One hour: `PT1H`
+- One day: `P1DT`
+- One week: `P7DT`
+- One month: `P30DT`
 
 The credentials file must be placed in the root of the project or in the
 location `/vault/secrets/credentials.ini`

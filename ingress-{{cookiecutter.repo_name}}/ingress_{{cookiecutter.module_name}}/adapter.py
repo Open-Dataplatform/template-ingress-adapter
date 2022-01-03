@@ -1,154 +1,81 @@
 """
-{{cookiecutter.name|title}} Adapter for Ingress
+Functions for the {{cookiecutter.name|title}} Ingress Adapter
 """
-import argparse
-from datetime import datetime
+from datetime import datetime, timedelta
 from io import BytesIO
-from typing import Optional, Dict, Tuple
+from typing import Dict, Tuple, List
 import logging
-import logging.config
-from configparser import ConfigParser
 
-from osiris.apis.ingress import Ingress
-from osiris.core.azure_client_authorization import ClientAuthorization
-
+import pandas as pd
 
 logger = logging.getLogger(__file__)
 
 
-def retrieve_data(state: Dict) -> Tuple[Optional[bytes], Dict]:
+def retrieve_data(from_date: datetime, to_date: datetime) -> Tuple[List[Dict[str, pd.DataFrame]], datetime]:
     """
-    Retrieves the data from {{cookiecutter.name|title}}.
+    Retrieves data from the source and stores it in a dataframe. The actual end time of the data is extracted and
+    returned together with Ingress filename(s) and dataframe(s).
     """
-    logger.info('Running the {{cookiecutter.name|title}} Ingress Adapter')
 
-    # Given the state from last run, retrieve next batch of data and update state
-    # - Notice, state will first be saved after successful upload
+    # TODO: Extract data and convert it to Pandas Dataframe. Example to emulate data retrieval:
+    url = 'https://github.com/jiwidi/time-series-forecasting-with-python/blob/master/datasets/air_pollution.csv?raw=true'
+    dataframe = pd.read_csv(url, parse_dates=['date'])
+    dataframe = dataframe[(from_date <= dataframe['date']) & (dataframe['date'] <= to_date)]
 
-    # TODO: Implement code to retrieve data
+    if dataframe.empty:
+        return None, None
 
-    # TODO: Return data and state
-    #       - If no new data in batch, return None and state (return None, state)
+    # TODO: Extract actual data end time and generate filename. Example:
+    data_end_date = dataframe.date.max() + timedelta(days=1)
+    filename = _get_filename(from_date, data_end_date, time_format='%Y%m%d')
 
-    # Example of how to return data
-    # - if data is collected and prepared in a DataFrame: ingest_data_df
-    # - then get the binary data: ingest_data_df.to_json(orient='records', date_format='iso').encode('UTF-8')
-    # Example:
-    # ingest_data = ingest_data_df.to_json(orient='records', date_format='iso').encode('UTF-8')
-    # return ingest_data, state
-    return b'', state
+    # TODO_TEMPLATE: How to take care of empty dataframes or errors?
+
+    # If you need to retrieve data from e.g. multiple endpoints, you can do something like:
+    # data = []
+    # data_end_dates = []
+    # for url in urls:
+    #     dataframe = pd.read_csv(url)
+
+    #     data_end_date = dataframe.timestamp.max() + timedelta(hours=1)
+    #     filename = _get_filename(from_date, data_end_date, time_format='%Y%m%dT%H')
+
+    #     data.append({filename, dataframe})
+
+    # data_end_date = min(data_end_dates)
+
+    # return data, data_end_date
+
+    return [{filename: dataframe}], data_end_date
 
 
-def __init_argparse() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description='Ingress Adapter for {{cookiecutter.name|title}}')
-
-    parser.add_argument('--conf',
-                        nargs='+',
-                        default=['conf.ini', '/etc/osiris/conf.ini'],
-                        help='setting the configuration file')
-    parser.add_argument('--credentials',
-                        nargs='+',
-                        default=['credentials.ini', '/vault/secrets/credentials.ini'],
-                        help='setting the credential file')
-
-    return parser
-
-def main():
+def upload_data_to_ingress(ingress_api, retrieved_data):
     """
-    Setups the ingress-api, retrieves state, uploads data to ingress-api, saves state after successful upload.
+    Uploads data to Ingress.
     """
-    arg_parser = __init_argparse()
-    args, _ = arg_parser.parse_known_args()
+    for filename, dataframe_to_ingest in retrieved_data.items():
+        file = BytesIO()
+        file.name = f'{filename}.parquet'
+        dataframe_to_ingest.to_parquet(file, engine='pyarrow', compression='snappy')
+        file.seek(0)
 
-    config = ConfigParser()
-    config.read(args.conf)
-    credentials_config = ConfigParser()
-    credentials_config.read(args.credentials)
-
-    logging.config.fileConfig(fname=config['Logging']['configuration_file'],  # type: ignore
-                              disable_existing_loggers=False)
-
-    # To disable azure INFO logging from Azure
-    if config.has_option('Logging', 'disable_logger_labels'):
-        disable_logger_labels = config['Logging']['disable_logger_labels'].splitlines()
-        for logger_label in disable_logger_labels:
-            logging.getLogger(logger_label).setLevel(logging.WARNING)
-
-    # Setup authorization
-    client_auth = ClientAuthorization(tenant_id=credentials_config['Authorization']['tenant_id'],
-                                      client_id=credentials_config['Authorization']['client_id'],
-                                      client_secret=credentials_config['Authorization']['client_secret'])
-
-    # Initialize the Ingress API
-    ingress_api = Ingress(client_auth=client_auth,
-                          ingress_url=config['Azure Storage']['ingress_url'],
-                          dataset_guid=config['Datasets']['source'])
-
-    # Get the state from last run.
-    # - The state is kept in the ingress-guid as state.json, if it does not exist, an empty dict is returned
-    state = ingress_api.retrieve_state()
-
-    # Get the next data to upload
-    data_to_ingest, state = retrieve_data(state)
-
-    # If no new data, return
-    if data_to_ingest is None:
-        logger.info('No new data to upload: {{cookiecutter.name|title}} Ingress Adapter')
-        return
-
-    # There are 4 options to upload data, where the first 2 options cover most cases
-    # Option 1: Upload to event time
-    # - Use this option when
-    #   - No transformation is needed afterward
-    #   - No historic data is updated after ingestion to ingress
-    # Option 2: Upload to ingress time
-    # - Use this option when
-    #   - A transformation is needed afterward
-    #   - Historic data is updated after ingestion to ingress
-    # Option 3: Upload non-json formatted data to event time
-    # - This case is not used often - no sample code below
-    # Option 3: Upload non-json formatted data to event time
-    # - This case is not used often - no sample code below
-    # Option 4: Upload non-json formatted data to ingress time
-    # - This case is not used often - no sample code below - example is ikontrol-adapter
-
-    # TODO: Only keep the code from [START] to [END] of one of the options of the code below
-
-    # [START] Option 1
-    file = BytesIO(data_to_ingest)
-    file.name = 'data.json'
-    # TODO: set event time (it should depend on the batch of data)
-    # The time resolution is set by event_time, hence if the format follows
-    # - If event_time = '' then data is stored in root folder
-    # - If event_time = '2021' then data is stored on yearly basis
-    # - If event_time = '2021-01' then data is stored on monthly basis
-    # ...
-    # - If event_time = '2021-01-01T01:01' then data is stored on minutely basis
-    event_time = '2021-01-01T01:01'
-    # Set if schema validation is needed
-    schema_validate = False
-
-    # This call we raise Exception unless 201 is returned
-    ingress_api.upload_json_file_event_time(file=file,
-                                            event_time=event_time,
-                                            schema_validate=schema_validate)
-    # [END] Option 1
-
-    # [START] Option 2
-    file = BytesIO(data_to_ingest)
-    file.name = datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S.%fZ.json')
-    # Set if schema validation is needed
-    schema_validate = False
-
-    # This call we raise Exception unless 201 is returned
-    ingress_api.upload_json_file(file=file,
-                                 schema_validate=schema_validate)
-    # [END] Option 2
-
-    # Save the state
-    ingress_api.save_state(state)
-    logger.info('Data successfully uploaded: {{cookiecutter.name|title}} Ingress Adapter')
+        ingress_api.upload_file(file=file)
+        logger.info("Data successfully uploaded: %s", filename)
 
 
-if __name__ == "__main__":
-    main()
+def _get_filename(from_date, to_date, time_format='%Y%m%dT%H%M%SZ'):
+    """Generates filename (without file extension) as time interval."""
+    from_date_str = datetime.strftime(from_date, time_format)
+    to_date_str = datetime.strftime(to_date, time_format)
+    return f'{from_date_str}--{to_date_str}'
+
+
+def extract_time_interval_from_state_file(state, date_format):
+    """
+    Generates from_date and to_date based on state file.
+    """
+    # TODO: Rewrite this so that it fits to your project
+    from_date = datetime.strptime(state['next_from_date'], date_format)
+    to_date = datetime.utcnow()
+
+    return from_date, to_date
