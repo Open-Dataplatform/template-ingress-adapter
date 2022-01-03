@@ -14,6 +14,8 @@ from osiris.core.io import parse_date_str
 
 from . import adapter
 
+logger = logging.getLogger(__file__)
+
 DATE_FORMAT_ISO = '%Y%m%dT%H%M%SZ'
 
 
@@ -98,6 +100,11 @@ def main():
 
         # Retrieve and upload data
         retrieved_data, retrieve_from_date = adapter.retrieve_data(retrieve_from_date, retrieve_to_date)
+
+        if retrieved_data is None:
+            logger.info('No data retrieved in the interval from %s to %s.', retrieve_from_date, retrieve_to_date)
+            break
+
         adapter.upload_data_to_ingress(ingress_api, retrieved_data)
 
         # TODO_TEMPLATE: Make sure that the loop breaks and logs error if the request is the same again and again.
