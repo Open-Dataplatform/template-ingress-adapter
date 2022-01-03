@@ -23,12 +23,12 @@ TODO
 ### Usage
 To run the adapter based on the state file, use:
 ```sh
-$ python -m ingress_{{cookiecutter.module_name}}.adapter
+$ python -m ingress_{{cookiecutter.module_name}}
 ```
 
 To run the adapter in a specific time interval, use:
 ```sh
-$ python -m ingress_{{cookiecutter.module_name}}.adapter --from_date 2021-01-01 --to_date 2021-01-20T12
+$ python -m ingress_{{cookiecutter.module_name}} --from_date 2021-01-01 --to_date 2021-01-20T12
 ```
 If `to_date` is not specified, it is set to utcnow. The timestamps are parsed by the Osiris parse_date_str().
 
