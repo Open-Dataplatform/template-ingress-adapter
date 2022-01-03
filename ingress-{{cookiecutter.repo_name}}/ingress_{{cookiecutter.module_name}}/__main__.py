@@ -85,7 +85,7 @@ def main():
     date_format_in_state_file = config['Datasets']['date_format_in_state_file']
 
     # Get from and to dates
-    run_adapter_based_on_state_file = args.from_date is not None
+    run_adapter_based_on_state_file = args.from_date is None
     if run_adapter_based_on_state_file:
         state = ingress_api.retrieve_state()
         from_date, to_date = adapter.extract_time_interval_from_state_file(state, date_format_in_state_file)
