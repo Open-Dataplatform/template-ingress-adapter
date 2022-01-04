@@ -107,7 +107,6 @@ def main():
 
         adapter.upload_data_to_ingress(ingress_api, retrieved_data)
 
-        # TODO_TEMPLATE: Make sure that the loop breaks and logs error if the request is the same again and again.
         # Update state file
         if run_adapter_based_on_state_file:
             state['next_from_date'] = datetime.strftime(retrieve_from_date, date_format_in_state_file)
