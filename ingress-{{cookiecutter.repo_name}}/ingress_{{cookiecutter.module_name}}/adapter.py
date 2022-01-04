@@ -40,20 +40,23 @@ def retrieve_data(from_date: datetime, to_date: datetime) -> Tuple[List[Dict[str
     #     data_end_date = dataframe.timestamp.max() + timedelta(hours=1)
     #     filename = _get_filename(from_date, data_end_date, time_format='%Y%m%dT%H')
 
-    #     data.append({filename, dataframe})
+    #     data.append({'filename': filename, 'data': dataframe})
 
     # data_end_date = min(data_end_dates)
 
     # return data, data_end_date
 
-    return [{filename: dataframe}], data_end_date
+    return [{'filename': filename, 'data': dataframe}], data_end_date
 
 
 def upload_data_to_ingress(ingress_api, retrieved_data):
     """
     Uploads data to Ingress.
     """
-    for filename, dataframe_to_ingest in retrieved_data.items():
+    for data_dict in retrieved_data:
+        filename = data_dict['filename']
+        dataframe_to_ingest = data_dict['data']
+
         file = BytesIO()
         file.name = f'{filename}.parquet'
         dataframe_to_ingest.to_parquet(file, engine='pyarrow', compression='snappy')

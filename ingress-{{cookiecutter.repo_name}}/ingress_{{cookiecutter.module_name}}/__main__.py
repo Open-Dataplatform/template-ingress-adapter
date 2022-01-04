@@ -90,7 +90,7 @@ def main():
         state = ingress_api.retrieve_state()
         from_date, to_date = adapter.extract_time_interval_from_state_file(state, date_format_in_state_file)
     else:
-        from_date, to_date = args.from_date, args.retrieve_to_date
+        from_date, to_date = args.from_date, args.to_date
 
     # The following loop is used to split the time interval if it is longer than max_interval_to_retrieve. If it is
     # longer, multiple retrievals and uploads are made.
